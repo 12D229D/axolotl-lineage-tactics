@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axolotl Lineage Tactics — Crianza + Táctica Roguelite</title>
+    <!-- Google Fonts: Outfit, Inter, Quicksand -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Quicksand:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="brand-wrapper">
+            <span class="brand-icon">🦎</span>
+            <h1 class="game-title">Axolotl Lineage Tactics</h1>
+        </div>
+        <nav class="nav-tabs">
+            <button class="nav-tab-btn active" data-scene="POND">🌊 Charca</button>
+            <button class="nav-tab-btn" data-scene="BREEDING">🧬 Crianza</button>
+            <button class="nav-tab-btn" data-scene="EXPEDITION">🗺️ Expedición</button>
+            <button class="nav-tab-btn" data-scene="COMBAT">⚔️ Combate</button>
+            <button class="nav-tab-btn" data-scene="LINEAGE">🏛️ Linaje & Museo</button>
+        </nav>
+        <div class="header-status">
+            <div class="dna-currency">🧪 <span id="dna-points-display">120</span> Puntos de ADN</div>
+            <div class="squad-counter">Escuadra: <span id="squad-count-display">0/4</span></div>
+        </div>
+    </header>
+
+    <main class="main-viewport">
+        <!-- 1. ESCENA: CHARCA DE CRIANZA (POND) -->
+        <section id="scene-pond" class="scene-view active">
+            <div class="scene-title-bar">
+                <div>
+                    <h2>🌊 Charca de Ajolotes</h2>
+                    <p class="subtitle" style="color: var(--color-text-muted); font-size: 0.9rem;">
+                        Gestiona tus ejemplares, asígnalos a tu escuadra de combate (máx 4) o llévalos a reproducirse.
+                    </p>
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button id="btn-spawn-founder" class="btn-secondary">+ Generar Ejemplar Silvestre</button>
+                    <button id="btn-start-expedition-quick" class="btn-primary">Lanzar Expedición Roguelite ➔</button>
+                </div>
+            </div>
+            <div id="pond-axolotl-grid" class="pond-grid-layout">
+                <!-- Se llena dinámicamente con las tarjetas de ajolotes -->
+            </div>
+        </section>
+
+        <!-- 2. ESCENA: CÁMARA DE CRIANZA (BREEDING) -->
+        <section id="scene-breeding" class="scene-view">
+            <div class="scene-title-bar">
+                <div>
+                    <h2>🧬 Cámara de Cruzamiento Genético</h2>
+                    <p class="subtitle" style="color: var(--color-text-muted); font-size: 0.9rem;">
+                        Cruza dos ejemplares para heredar alelos dominantes y recesivos, y provocar mutaciones de vigor híbrido.
+                    </p>
+                </div>
+            </div>
+
+            <div class="breeding-chamber-wrapper">
+                <div id="parent-slot-1" class="parent-slot">
+                    <span style="font-size: 2rem;">🦎</span>
+                    <p><b>Madre / Progenitor 1</b></p>
+                    <small style="color: var(--color-text-muted);">Haz clic en un ajolote abajo</small>
+                </div>
+
+                <div class="cross-button-col">
+                    <div class="dna-helix-icon">🧬</div>
+                    <button id="btn-execute-breeding" class="btn-primary" disabled>FUSIONAR GENOMAS</button>
+                </div>
+
+                <div id="parent-slot-2" class="parent-slot">
+                    <span style="font-size: 2rem;">🦎</span>
+                    <p><b>Padre / Progenitor 2</b></p>
+                    <small style="color: var(--color-text-muted);">Haz clic en un ajolote abajo</small>
+                </div>
+            </div>
+
+            <div id="breeding-selection-list">
+                <h3 style="margin-bottom: 1rem; font-family: var(--font-heading);">Selecciona progenitores de tu charca:</h3>
+                <div id="breeding-candidates-grid" class="pond-grid-layout"></div>
+            </div>
+
+            <div id="breeding-result-log" class="mutation-log-panel" style="display: none;">
+                <h4>📜 Registro del Experimento Genético</h4>
+                <div id="mutation-log-text"></div>
+            </div>
+        </section>
+
+        <!-- 3. ESCENA: MAPA DE EXPEDICIÓN ROGUELITE (EXPEDITION) -->
+        <section id="scene-expedition" class="scene-view">
+            <div class="scene-title-bar">
+                <div>
+                    <h2>🗺️ Expedición a las Lagunas Abisales</h2>
+                    <p class="subtitle" style="color: var(--color-text-muted); font-size: 0.9rem;">
+                        Recorre los nodos del pantano para recolectar genes ancestrales y ADN.
+                    </p>
+                </div>
+            </div>
+
+            <div class="expedition-map-wrapper">
+                <div class="biom-banner">
+                    <h3 id="expedition-biom-title" style="font-family: var(--font-heading); font-size: 1.4rem; color: var(--color-axolotl-cyan);">
+                        Laguna de Loto Eléctrico (Semilla: <span id="expedition-seed-display">AL-882</span>)
+                    </h3>
+                    <p style="color: var(--color-text-muted); margin-top: 0.25rem;">Supera los 4 nodos para regresar a la charca con el botín intacto.</p>
+                </div>
+
+                <div class="nodes-timeline">
+                    <div class="node-point current" id="node-1">💧<br><small style="font-size: 0.65rem;">Nodo 1</small></div>
+                    <div class="node-line" id="line-1"></div>
+                    <div class="node-point" id="node-2">🌿<br><small style="font-size: 0.65rem;">Nodo 2</small></div>
+                    <div class="node-line" id="line-2"></div>
+                    <div class="node-point" id="node-3">⚡<br><small style="font-size: 0.65rem;">Nodo 3</small></div>
+                    <div class="node-line" id="line-3"></div>
+                    <div class="node-point" id="node-4">👑<br><small style="font-size: 0.65rem;">Jefe</small></div>
+                </div>
+
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <button id="btn-engage-combat" class="btn-primary" style="font-size: 1.1rem; padding: 0.85rem 2rem;">
+                        Entrar en Combate con Depredadores ⚔️
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. ESCENA: COMBATE TÁCTICO HEXAGONAL (COMBAT) -->
+        <section id="scene-combat" class="scene-view">
+            <div class="scene-title-bar">
+                <div>
+                    <h2>⚔️ Encuentro Táctico Acuático</h2>
+                    <p class="subtitle" style="color: var(--color-text-muted); font-size: 0.9rem;">
+                        Mueve a tus ajolotes en la cuadrícula hexagonal, aprovecha corrientes y lanza destellos y burbujas elementales.
+                    </p>
+                </div>
+                <div id="combat-round-counter" style="font-family: var(--font-heading); font-size: 1.1rem; color: var(--color-axolotl-pink);">
+                    Ronda 1
+                </div>
+            </div>
+
+            <div class="combat-layout">
+                <div class="combat-arena-container">
+                    <canvas id="combat-hex-canvas" width="620" height="460"></canvas>
+                </div>
+
+                <aside class="combat-side-panel">
+                    <div class="panel-card">
+                        <h4>Ajolote Activo</h4>
+                        <div id="hud-selected-unit">
+                            <p class="hud-empty">Haz clic sobre uno de tus ajolotes.</p>
+                        </div>
+                    </div>
+
+                    <div class="panel-card">
+                        <h4>Acciones Tácticas</h4>
+                        <div id="hud-unit-actions" class="hud-actions-container"></div>
+                    </div>
+
+                    <div class="panel-card">
+                        <h4>Bitácora del Pantano</h4>
+                        <div id="combat-battle-log" class="battle-log-feed"></div>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <!-- 5. ESCENA: ÁRBOL GENEALÓGICO Y MUSEO (LINEAGE) -->
+        <section id="scene-lineage" class="scene-view">
+            <div class="scene-title-bar">
+                <div>
+                    <h2>🏛️ Museo de Linajes & Dinastía de Ajolotes</h2>
+                    <p class="subtitle" style="color: var(--color-text-muted); font-size: 0.9rem;">
+                        Trazabilidad genealógica y memoria biológica de todas las generaciones criadas.
+                    </p>
+                </div>
+                <button id="btn-export-database" class="btn-secondary">Exportar Registro SQLite (JSON)</button>
+            </div>
+            <div id="lineage-tree-mount"></div>
+        </section>
+    </main>
+
+    <!-- Modal de Inspección de Genoma -->
+    <div id="axolotl-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="modal-close" class="modal-close-btn">&times;</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- Scripts ES Modules -->
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
